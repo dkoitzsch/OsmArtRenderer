@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/blend.frag</file>
+        <file>shaders/color_combiner.frag</file>
+        <file>shaders/default.vert</file>
+        <file>shaders/dilation.frag</file>
+        <file>shaders/erosion.frag</file>
+        <file>shaders/gaussian_blur.frag</file>
+        <file>shaders/invert.frag</file>
+        <file>shaders/lighten.frag</file>
+        <file>shaders/mask.frag</file>
+        <file>shaders/masked_overlay.frag</file>
+        <file>shaders/noise.frag</file>
+        <file>shaders/simple.frag</file>
+        <file>shaders/threshold_combiner.frag</file>
+    </qresource>
+</RCC>

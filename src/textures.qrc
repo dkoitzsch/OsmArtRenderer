@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>textures/blue_01.jpg</file>
+        <file>textures/blue_20.jpg</file>
+        <file>textures/blue_24.jpg</file>
+        <file>textures/brown_40.jpg</file>
+        <file>textures/brown_42.jpg</file>
+        <file>textures/brown_grunge_01.jpg</file>
+        <file>textures/gray_01.jpg</file>
+        <file>textures/gray_02.jpg</file>
+        <file>textures/gray_03.jpg</file>
+        <file>textures/gray_04.jpg</file>
+        <file>textures/gray_grunge_01.jpg</file>
+        <file>textures/green_09.jpg</file>
+        <file>textures/orange_10.jpg</file>
+        <file>textures/orange_11.jpg</file>
+        <file>textures/writing_01.jpg</file>
+        <file>textures/writing_02.jpg</file>
+        <file>textures/writing_03.jpg</file>
+    </qresource>
+</RCC>
