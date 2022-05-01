@@ -68,6 +68,7 @@ void MainWindow::SetupUi()
     });
     QPushButton* btn_render_watercolor_effect = new QPushButton(tr("Render Watercolor Effect"));
     QObject::connect(btn_render_watercolor_effect, &QPushButton::clicked, this, [this] {
+        ChangeCanvasTo(canvas_);
         RenderEffect(watercolor_effect_);
     });
 
