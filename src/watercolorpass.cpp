@@ -158,6 +158,9 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
     // 8) Blend 4) and 7) with alpha = 0.8f to get the final image
     QImage final = Blend(textured_processed_img, masked, width, height, final_blend_alpha_);
     //qDebug() << "------Blend pass..." << (timer.elapsed() - t) << "\u0394ms\n";
+#ifdef QT_DEBUG
+    final.save(name_ + "_8_final.png", "PNG", 100);
+#endif
     return final;
 }
 
