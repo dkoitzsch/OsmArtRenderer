@@ -72,9 +72,6 @@ QImage WatercolorPass::Process(const QImage& input_image)
  * */
 QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& texture, const double& noise_scale_factor)
 {
-    //QElapsedTimer timer;
-    //timer.start();
-
     int width = input_image.width();
     int height = input_image.height();
 
@@ -82,6 +79,8 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
         noise_image_ = new QImage(QNoise::create_noise_image(width, height, noise_scale_factor));
 #ifdef QT_DEBUG
         noise_image_->save("noise.png", "PNG", 100);
+        QElapsedTimer timer;
+        timer.start();
 #endif
     }
 
@@ -90,9 +89,9 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
     processed_img = Blur(processed_img, QVector2D(0.0, 1.0), BLURSIZE_13);
 #ifdef QT_DEBUG
     processed_img.save(name_ + "_1_blur.png", "PNG", 100);
+    qint64 t = timer.elapsed();
+    qDebug() << "------Blur (2x) pass..." << t << "\u0394ms\n";
 #endif
-    //qint64 t = timer.elapsed();
-    //qDebug() << "------Blur (2x) pass..." << t << "\u0394ms\n";
 /*
     // 2) Create noise
     QImage noise_img = QNoise::create_noise_image(width, height, noise_scale_factor);
@@ -112,9 +111,9 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
     });
 #ifdef QT_DEBUG
     noised_processed_img.save(name_ + "_3_noised_processed.png", "PNG", 100);
+    qDebug() << "------Threshold Combiner pass..." << (timer.elapsed() - t) << "\u0394ms\n";
+    t = timer.elapsed();
 #endif
-    //qDebug() << "------Threshold Combiner pass..." << (timer.elapsed() - t) << "\u0394ms\n";
-    //t = timer.elapsed();
 
     // 4) Combine 3) and texture with color_combiner.frag
     QImage textured_processed_img = PostProcess({noised_processed_img, texture},
@@ -122,9 +121,9 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
                                                  ":/shaders/default.vert", ":/shaders/color_combiner.frag");
 #ifdef QT_DEBUG
     textured_processed_img.save(name_ + "_4_textured_processed.png", "PNG", 100);
+    qDebug() << "------Color Combiner pass..." << (timer.elapsed() - t) << "\u0394ms\n";
+    t = timer.elapsed();
 #endif
-    //qDebug() << "------Color Combiner pass..." << (timer.elapsed() - t) << "\u0394ms\n";
-    //t = timer.elapsed();
 
     // 5) Invert 3) with invert.frag
     QImage inverted_noised_processed_img = PostProcess({noised_processed_img},
@@ -132,18 +131,18 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
                                                         ":/shaders/default.vert", ":/shaders/invert.frag");
 #ifdef QT_DEBUG
     inverted_noised_processed_img.save(name_ + "_5_inverted_noised_processed.png", "PNG", 100);
+    qDebug() << "------Invertpass..." << (timer.elapsed() - t) << "\u0394ms\n";
+    t = timer.elapsed();
 #endif
-    //qDebug() << "------Invertpass..." << (timer.elapsed() - t) << "\u0394ms\n";
-    //t = timer.elapsed();
 
     // 6) Blur 5) with blur.frag and size = 13
     QImage blurred_inverted_noised_processed_img = Blur(inverted_noised_processed_img, QVector2D(1.0, 0.0), BLURSIZE_13);
     blurred_inverted_noised_processed_img = Blur(blurred_inverted_noised_processed_img, QVector2D(0.0, 1.0), BLURSIZE_13);
 #ifdef QT_DEBUG
     blurred_inverted_noised_processed_img.save(name_ + "_6_blurred_inverted_noised_processed.png", "PNG", 100);
+    qDebug() << "------Blur (2x) pass..." << (timer.elapsed() - t) << "\u0394ms\n";
+    t = timer.elapsed();
 #endif
-    //qDebug() << "------Blur (2x) pass..." << (timer.elapsed() - t) << "\u0394ms\n";
-    //t = timer.elapsed();
 
     // 7) Mask 5) and 6) with mask.frag (to just get the blurred outlines)
     QImage masked = PostProcess({blurred_inverted_noised_processed_img, inverted_noised_processed_img},
@@ -151,16 +150,16 @@ QImage WatercolorPass::ProcessStep(const QImage& input_image, const QImage& text
                                  ":/shaders/default.vert", ":/shaders/mask.frag");
 #ifdef QT_DEBUG
     masked.save(name_ + "_7_masked.png", "PNG", 100);
+    qDebug() << "------Mask pass..." << (timer.elapsed() - t) << "\u0394ms\n";
+    t = timer.elapsed();
 #endif
-    //qDebug() << "------Mask pass..." << (timer.elapsed() - t) << "\u0394ms\n";
-    //t = timer.elapsed();
 
     // 8) Blend 4) and 7) with alpha = 0.8f to get the final image
     //QImage final = Blend(textured_processed_img, masked, width, height, final_blend_alpha_);
     QImage final = Blend(masked, textured_processed_img, width, height, final_blend_alpha_);
-    //qDebug() << "------Blend pass..." << (timer.elapsed() - t) << "\u0394ms\n";
 #ifdef QT_DEBUG
     final.save(name_ + "_8_final.png", "PNG", 100);
+    qDebug() << "------Blend pass..." << (timer.elapsed() - t) << "\u0394ms\n";
 #endif
     return final;
 }
